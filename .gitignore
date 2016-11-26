@@ -1,0 +1,10 @@
+/.vs
+/Debug
+/Release
+/auth_bypass/Debug
+/auth_bypass/*.user
+/*.opendb
+/*.db
+/wowned/Debug
+/wowned/Release
+/wowned/*.user

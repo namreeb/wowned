@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wowned", "wowned\wowned.vcxproj", "{B358F7FB-968E-4718-9294-6DB85BFB5D3A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "auth_bypass", "auth_bypass\auth_bypass.vcxproj", "{61917A75-1085-49E4-810D-2E0DC9882F62}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B358F7FB-968E-4718-9294-6DB85BFB5D3A}.Debug|x86.ActiveCfg = Debug|Win32
+		{B358F7FB-968E-4718-9294-6DB85BFB5D3A}.Debug|x86.Build.0 = Debug|Win32
+		{B358F7FB-968E-4718-9294-6DB85BFB5D3A}.Release|x86.ActiveCfg = Release|Win32
+		{B358F7FB-968E-4718-9294-6DB85BFB5D3A}.Release|x86.Build.0 = Release|Win32
+		{61917A75-1085-49E4-810D-2E0DC9882F62}.Debug|x86.ActiveCfg = Debug|Win32
+		{61917A75-1085-49E4-810D-2E0DC9882F62}.Debug|x86.Build.0 = Debug|Win32
+		{61917A75-1085-49E4-810D-2E0DC9882F62}.Release|x86.ActiveCfg = Release|Win32
+		{61917A75-1085-49E4-810D-2E0DC9882F62}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
