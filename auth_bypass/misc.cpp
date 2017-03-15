@@ -31,8 +31,9 @@
 #include <memory>
 #include <cstdint>
 #include <vector>
+#include <sstream>
 
-using GetRealmT = const char * (__thiscall *)(void *pThis);
+using GetRealmT = const char * (*)();
 
 namespace misc
 {
@@ -41,7 +42,7 @@ const Offsets *Offsets::Current = nullptr;
 void GetgN(const std::string &username, std::vector<std::uint8_t> &g, std::vector<std::uint8_t> &N)
 {
     auto const getRealm = reinterpret_cast<GetRealmT>(Offsets::Current->GetLogonServer);
-    auto const realmName = getRealm(nullptr);
+    auto const realmName = getRealm();
 
     std::unique_ptr<Socket> socket;
 
@@ -56,7 +57,9 @@ void GetgN(const std::string &username, std::vector<std::uint8_t> &g, std::vecto
     }
     catch (boost::system::system_error const &e)
     {
-        MessageBoxA(nullptr, e.what(), "GetN failed auth connect", 0);
+        std::stringstream str;
+        str << "Error connecting to " << realmName << ".\n" << e.what();
+        MessageBoxA(nullptr, str.str().c_str(), "GetgN failed auth connect", 0);
     }
 
     try
