@@ -32,6 +32,12 @@ For reference, these are two commits which fix 'method one' and 'method two' res
 https://github.com/cmangos/mangos-classic/commit/74d51cf70d67f6d4a47321a4226e7473cb8e2601
 https://github.com/cmangos/mangos-classic/commit/0d2b7e38c886ddd6828cfa75e2daba5121467383
 
+I have been contacted by several people to thank me for providing a new revenue stream, whereby they abuse these issues
+(using their own exploits) to steal gold from their victims and re-sell it on private servers.  One even offered me a
+kickback in exchange for not releasing this.  For those of you reading this, I am thoroughly unimpressed with your so-called
+abilities.  Any slashdot script kiddie can break something.  Show me something positive you've created and then I will take
+you seriously.
+
 # credit
 As mentioned above, credit for the initial discovery goes to Chaosvex.  Credit for the discovery of method two goes to
 Daemon of nostalrius.org, who found the second issue when he and I were discussing the first one.
