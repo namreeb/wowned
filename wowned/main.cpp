@@ -23,7 +23,7 @@
  */
 
 #define NAME    "wowned"
-#define VERSION "v0.1"
+#define VERSION "v0.2"
 
 #include <iostream>
 #include <string>
