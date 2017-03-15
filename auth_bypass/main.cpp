@@ -100,7 +100,6 @@ extern "C" __declspec(dllexport) void Load1()
 extern "C" __declspec(dllexport) void Load2()
 {
     const misc::Offsets *currentVersion = nullptr;
-    auto isClassic = false;
 
     try
     {
@@ -108,7 +107,6 @@ extern "C" __declspec(dllexport) void Load2()
         {
             case Build[VER::Classic]:
                 currentVersion = &misc::Versions[VER::Classic];
-                isClassic = true;
                 break;
             case Build[VER::TBC]:
                 currentVersion = &misc::Versions[VER::TBC];
