@@ -43,9 +43,11 @@ class Interface
         };
 
         using RealmSendT = int(__thiscall WowConnection::*)(void *data, int len, bool disableEncryption);
+        using RealmSendCataT = int(__thiscall WowConnection::*)(void *data, int len);
 
     private:
         std::unique_ptr<hadesmem::PatchDetour<RealmSendT>> m_realmSendHook;
+        std::unique_ptr<hadesmem::PatchDetour<RealmSendCataT>> m_realmSendCataHook;
 
         std::unique_ptr<hadesmem::PatchRaw> m_ignoreSRP6Patch;
 
@@ -53,7 +55,7 @@ class Interface
         std::string m_username;
 
     public:
-        Interface();
+        Interface(bool cata);
 
         const std::string &GetUsername() const { return m_username; }
 
@@ -67,7 +69,7 @@ class One : public Interface
         std::unique_ptr<hadesmem::PatchRaw> m_gruntClientLinkPatch;
 
     public:
-        One();
+        One(bool cata);
 
         virtual bool IsOne() const { return true; }
 };
@@ -92,7 +94,7 @@ class Two : public Interface
         std::unique_ptr<hadesmem::PatchDetour<CalculateProofT>> m_calculateProofHook;
 
     public:
-        Two();
+        Two(bool cata);
 
         virtual bool IsOne() const { return false; }
 };

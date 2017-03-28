@@ -35,7 +35,7 @@
 
 #define THROW_IF(expr, message) if (expr) { throw std::exception(message); }
 
-static constexpr unsigned int Build[] = { 5875, 8606, 12340 };
+static constexpr unsigned int Build[] = { 5875, 8606, 12340, 15595 };
 
 
 namespace
@@ -70,6 +70,7 @@ using VER = misc::Version;
 extern "C" __declspec(dllexport) void Load1()
 {
     const misc::Offsets *currentVersion = nullptr;
+    auto cata = false;
 
     try
     {
@@ -83,6 +84,10 @@ extern "C" __declspec(dllexport) void Load1()
                 break;
             case Build[VER::WOTLK]:
                 currentVersion = &misc::Versions[VER::WOTLK];
+                break;
+            case Build[VER::Cata]:
+                currentVersion = &misc::Versions[VER::Cata];
+                cata = true;
                 break;
             default:
                 throw std::exception("Unsupported version");
@@ -94,12 +99,13 @@ extern "C" __declspec(dllexport) void Load1()
     }
 
     *const_cast<const misc::Offsets **>(&misc::Offsets::Current) = currentVersion;
-    method::gMethod = std::make_unique<method::One>();
+    method::gMethod = std::make_unique<method::One>(cata);
 }
 
 extern "C" __declspec(dllexport) void Load2()
 {
     const misc::Offsets *currentVersion = nullptr;
+    auto cata = false;
 
     try
     {
@@ -114,6 +120,10 @@ extern "C" __declspec(dllexport) void Load2()
             case Build[VER::WOTLK]:
                 currentVersion = &misc::Versions[VER::WOTLK];
                 break;
+            case Build[VER::Cata]:
+                currentVersion = &misc::Versions[VER::Cata];
+                cata = true;
+                break;
             default:
                 throw std::exception("Unsupported version");
         }
@@ -124,5 +134,5 @@ extern "C" __declspec(dllexport) void Load2()
     }
 
     *const_cast<const misc::Offsets **>(&misc::Offsets::Current) = currentVersion;
-    method::gMethod = std::make_unique<method::Two>();
+    method::gMethod = std::make_unique<method::Two>(cata);
 }

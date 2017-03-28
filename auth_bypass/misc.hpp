@@ -62,7 +62,8 @@ enum Version
 {
     Classic = 0,
     TBC,
-    WOTLK
+    WOTLK,
+    Cata
 };
 
 constexpr struct Offsets
@@ -124,6 +125,21 @@ constexpr struct Offsets
         0xA4,
         0xC8,
         0x1C8,
+        0x00,
+        0x20,
+        0x48
+    },
+    // Cataclysm
+    {
+        0x54E5A0,
+        0xD27628,
+        0xB03A36,
+        0x4CF0E0,
+        0xB79BB9,
+        0xB3A580,
+        0xA4,
+        0xC8,
+        0x1CC,
         0x00,
         0x20,
         0x48

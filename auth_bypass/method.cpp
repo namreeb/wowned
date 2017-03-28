@@ -152,28 +152,45 @@ namespace method
 {
 std::unique_ptr<method::Interface> gMethod;
 
-Interface::Interface()
+Interface::Interface(bool cata)
 {
     const hadesmem::Process process(::GetCurrentProcessId());
 
-    m_realmSendHook = std::make_unique<hadesmem::PatchDetour<RealmSendT>>(process,
-        hadesmem::detail::AliasCastUnchecked<RealmSendT>(misc::Offsets::Current->WowConnection__SendRaw),
-        [&username = m_username] (hadesmem::PatchDetourBase *detourBase, WowConnection *realm, void *data, int len, bool disableEncryption)
+    if (cata)
+    {
+        m_realmSendCataHook = std::make_unique<hadesmem::PatchDetour<RealmSendCataT>>(process,
+            hadesmem::detail::AliasCastUnchecked<RealmSendCataT>(misc::Offsets::Current->WowConnection__SendRaw),
+            [&username = m_username] (hadesmem::PatchDetourBase *detourBase, WowConnection *realm, void *data, int len)
+            {
+                AmmendRealmPacket(data, username);
+                auto const orig = detourBase->GetTrampolineT<RealmSendCataT>();
+                return (realm->*orig)(data, len);
+            }
+        );
+
+        m_realmSendCataHook->Apply();
+    }
+    else
+    {
+        m_realmSendHook = std::make_unique<hadesmem::PatchDetour<RealmSendT>>(process,
+            hadesmem::detail::AliasCastUnchecked<RealmSendT>(misc::Offsets::Current->WowConnection__SendRaw),
+            [&username = m_username] (hadesmem::PatchDetourBase *detourBase, WowConnection *realm, void *data, int len, bool disableEncryption)
         {
             AmmendRealmPacket(data, username);
             auto const orig = detourBase->GetTrampolineT<RealmSendT>();
             return (realm->*orig)(data, len, disableEncryption);
         }
-    );
+        );
 
-    m_realmSendHook->Apply();
+        m_realmSendHook->Apply();
+    }
 
     std::vector<std::uint8_t> nopPatch(2, 0x90);
     m_ignoreSRP6Patch = std::make_unique<hadesmem::PatchRaw>(process, reinterpret_cast<PVOID>(misc::Offsets::Current->IgnoreServerSRP6), nopPatch);
     m_ignoreSRP6Patch->Apply();
 }
 
-One::One()
+One::One(bool cata) : Interface(cata)
 {
     const hadesmem::Process process(::GetCurrentProcessId());
 
@@ -193,7 +210,7 @@ One::One()
     m_gruntClientLinkPatch->Apply();
 }
 
-Two::Two()
+Two::Two(bool cata) : Interface(cata)
 {
     const hadesmem::Process process(::GetCurrentProcessId());
 
