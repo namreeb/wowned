@@ -26,6 +26,7 @@
 #include "misc.hpp"
 #include "CDataStore.hpp"
 #include "SRP6a.hpp"
+#include "offsets.hpp"
 
 #include <Windows.h>
 
@@ -61,19 +62,19 @@ struct GruntClientLink
 {
 void SetState(unsigned int state)
 {
-    auto const p = reinterpret_cast<std::uint32_t *>(reinterpret_cast<std::uint8_t *>(this) + misc::Offsets::Current->GruntClientLinkState);
+    auto const p = reinterpret_cast<std::uint32_t *>(reinterpret_cast<std::uint8_t *>(this) + sOffsets().GetStatic(Offset::GruntClientLinkState));
     *p = state;
 }
 
 void SetSessionKey(const std::vector<std::uint8_t> &key)
 {
-    auto const p = reinterpret_cast<std::uint8_t *>(this) + misc::Offsets::Current->GruntClientSessionKey;
+    auto const p = reinterpret_cast<std::uint8_t *>(this) + sOffsets().Get(Offset::GruntClientSessionKey);
     memcpy(p, &key[0], key.size());
 }
 
 method::Interface::WowConnection *GetConnection()
 {
-    return *reinterpret_cast<method::Interface::WowConnection **>(reinterpret_cast<std::uint8_t *>(this) + misc::Offsets::Current->GruntClientLinkConnection);
+    return *reinterpret_cast<method::Interface::WowConnection **>(reinterpret_cast<std::uint8_t *>(this) + sOffsets().GetStatic(Offset::GruntClientLinkConnection));
 }
 
 int ReconnectChallenge(CDataStore *packet)
@@ -118,7 +119,7 @@ int ReconnectChallenge(CDataStore *packet)
 
 void Send(CDataStore *packet)
 {
-    auto const sendPacket = hadesmem::detail::AliasCastUnchecked<method::One::RealmSendT>(misc::Offsets::Current->WowConnection__SendRaw);
+    auto const sendPacket = hadesmem::detail::AliasCastUnchecked<method::One::RealmSendT>(sOffsets().Get(Offset::WowConnection__SendRaw));
     auto const p = GetConnection();
     (p->*sendPacket)(packet->m_data, packet->m_bytesWritten, true);
 }
@@ -130,18 +131,18 @@ void UpdateSRP(const std::string &username, std::uint8_t *srp6Client, const std:
 {
     const crypto::SRP6a srp6(g, N, true, s, B);
 
-    auto const sessionA = srp6Client + misc::Offsets::Current->SRP6A;
+    auto const sessionA = srp6Client + sOffsets().GetStatic(Offset::SRP6A);
     std::vector<std::uint8_t> A;
     srp6.GetA(A);
     memcpy(sessionA, &A[0], A.size());
 
-    auto const sessionKey = srp6Client + misc::Offsets::Current->SRP6SessionKey;
+    auto const sessionKey = srp6Client + sOffsets().GetStatic(Offset::SRP6SessionKey);
     std::vector<std::uint8_t> K;
     srp6.GetK(K);
     std::reverse(K.begin(), K.end());
     memcpy(sessionKey, &K[0], K.size());
 
-    auto const sessionM = srp6Client + misc::Offsets::Current->SRP6M;
+    auto const sessionM = srp6Client + sOffsets().GetStatic(Offset::SRP6M);
     std::vector<std::uint8_t> M;
     srp6.GetM(username, M);
     memcpy(sessionM, &M[0], M.size());
@@ -152,14 +153,14 @@ namespace method
 {
 std::unique_ptr<method::Interface> gMethod;
 
-Interface::Interface(bool cata)
+Interface::Interface()
 {
     const hadesmem::Process process(::GetCurrentProcessId());
 
-    if (cata)
+    if (sOffsets().IsCata())
     {
         m_realmSendCataHook = std::make_unique<hadesmem::PatchDetour<RealmSendCataT>>(process,
-            hadesmem::detail::AliasCastUnchecked<RealmSendCataT>(misc::Offsets::Current->WowConnection__SendRaw),
+            hadesmem::detail::AliasCastUnchecked<RealmSendCataT>(sOffsets().Get(Offset::WowConnection__SendRaw)),
             [&username = m_username] (hadesmem::PatchDetourBase *detourBase, WowConnection *realm, void *data, int len)
             {
                 AmmendRealmPacket(data, username);
@@ -173,7 +174,7 @@ Interface::Interface(bool cata)
     else
     {
         m_realmSendHook = std::make_unique<hadesmem::PatchDetour<RealmSendT>>(process,
-            hadesmem::detail::AliasCastUnchecked<RealmSendT>(misc::Offsets::Current->WowConnection__SendRaw),
+            hadesmem::detail::AliasCastUnchecked<RealmSendT>(sOffsets().Get(Offset::WowConnection__SendRaw)),
             [&username = m_username] (hadesmem::PatchDetourBase *detourBase, WowConnection *realm, void *data, int len, bool disableEncryption)
         {
             AmmendRealmPacket(data, username);
@@ -186,11 +187,11 @@ Interface::Interface(bool cata)
     }
 
     std::vector<std::uint8_t> nopPatch(2, 0x90);
-    m_ignoreSRP6Patch = std::make_unique<hadesmem::PatchRaw>(process, reinterpret_cast<PVOID>(misc::Offsets::Current->IgnoreServerSRP6), nopPatch);
+    m_ignoreSRP6Patch = std::make_unique<hadesmem::PatchRaw>(process, reinterpret_cast<PVOID>(sOffsets().Get(Offset::IgnoreServerSRP6)), nopPatch);
     m_ignoreSRP6Patch->Apply();
 }
 
-One::One(bool cata) : Interface(cata)
+One::One() : Interface()
 {
     const hadesmem::Process process(::GetCurrentProcessId());
 
@@ -201,21 +202,21 @@ One::One(bool cata) : Interface(cata)
     std::vector<std::uint8_t> reconnectPatch(4);
     memcpy(&reconnectPatch[0], &reconnectChallenge, sizeof(reconnectChallenge));
 
-    m_reconnectChallengePatch = std::make_unique<hadesmem::PatchRaw>(process, reinterpret_cast<PVOID>(misc::Offsets::Current->ReconnectChallengeHandler), reconnectPatch);
+    m_reconnectChallengePatch = std::make_unique<hadesmem::PatchRaw>(process, reinterpret_cast<PVOID>(sOffsets().Get(Offset::ReconnectChallengeHandler)), reconnectPatch);
     m_reconnectChallengePatch->Apply();
 
     std::vector<std::uint8_t> nopPatch(5, 0x90);
 
-    m_gruntClientLinkPatch = std::make_unique<hadesmem::PatchRaw>(process, reinterpret_cast<PVOID>(misc::Offsets::Current->GruntClientLinkInit), nopPatch);
+    m_gruntClientLinkPatch = std::make_unique<hadesmem::PatchRaw>(process, reinterpret_cast<PVOID>(sOffsets().Get(Offset::GruntClientLinkInit)), nopPatch);
     m_gruntClientLinkPatch->Apply();
 }
 
-Two::Two(bool cata) : Interface(cata)
+Two::Two() : Interface()
 {
     const hadesmem::Process process(::GetCurrentProcessId());
 
     m_calculateProofHook = std::make_unique<hadesmem::PatchDetour<CalculateProofT>>(process,
-        hadesmem::detail::AliasCastUnchecked<CalculateProofT>(misc::Offsets::Current->SRP6CalculateProof),
+        hadesmem::detail::AliasCastUnchecked<CalculateProofT>(sOffsets().Get(Offset::SRP6CalculateProof)),
         [&username = m_username](hadesmem::PatchDetourBase *detourBase, SRP6_Client *srp6,
             const std::uint8_t *N, unsigned int NLength,
             const std::uint8_t *g, unsigned int gLength,

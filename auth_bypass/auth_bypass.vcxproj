@@ -73,12 +73,14 @@
     <ClCompile Include="method.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="misc.cpp" />
+    <ClCompile Include="offsets.cpp" />
     <ClCompile Include="SRP6a.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CDataStore.hpp" />
     <ClInclude Include="method.hpp" />
     <ClInclude Include="misc.hpp" />
+    <ClInclude Include="offsets.hpp" />
     <ClInclude Include="socket.hpp" />
     <ClInclude Include="SRP6a.hpp" />
   </ItemGroup>

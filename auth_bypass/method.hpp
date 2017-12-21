@@ -55,7 +55,7 @@ class Interface
         std::string m_username;
 
     public:
-        Interface(bool cata);
+        Interface();
 
         const std::string &GetUsername() const { return m_username; }
 
@@ -69,7 +69,7 @@ class One : public Interface
         std::unique_ptr<hadesmem::PatchRaw> m_gruntClientLinkPatch;
 
     public:
-        One(bool cata);
+        One();
 
         virtual bool IsOne() const { return true; }
 };
@@ -94,7 +94,7 @@ class Two : public Interface
         std::unique_ptr<hadesmem::PatchDetour<CalculateProofT>> m_calculateProofHook;
 
     public:
-        Two(bool cata);
+        Two();
 
         virtual bool IsOne() const { return false; }
 };

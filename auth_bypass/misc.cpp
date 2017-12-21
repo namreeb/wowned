@@ -25,6 +25,7 @@
 #include "misc.hpp"
 #include "CDataStore.hpp"
 #include "socket.hpp"
+#include "offsets.hpp"
 
 #include <string>
 #include <cstring>
@@ -37,11 +38,9 @@ using GetRealmT = const char * (*)();
 
 namespace misc
 {
-const Offsets *Offsets::Current = nullptr;
-
 void GetgN(const std::string &username, std::vector<std::uint8_t> &g, std::vector<std::uint8_t> &N)
 {
-    auto const getRealm = reinterpret_cast<GetRealmT>(Offsets::Current->GetLogonServer);
+    auto const getRealm = reinterpret_cast<GetRealmT>(sOffsets().Get(Offset::GetLogonServer));
     auto const realmName = getRealm();
 
     std::unique_ptr<Socket> socket;

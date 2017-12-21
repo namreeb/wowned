@@ -22,16 +22,43 @@
     SOFTWARE.
  */
 
-#include "method.hpp"
+#pragma once
 
-#include <memory>
+#include <cstdint>
 
-extern "C" __declspec(dllexport) void Load1()
+enum Offset
 {
-    method::gMethod = std::make_unique<method::One>();
-}
+    WowConnection__SendRaw = 0,
+    ReconnectChallengeHandler,
+    IgnoreServerSRP6,
+    GetLogonServer,
+    GruntClientLinkInit,
+    SRP6CalculateProof,
+    GruntClientLinkState,
+    GruntClientSessionKey,
+    GruntClientLinkConnection,
+    SRP6A,
+    SRP6SessionKey,
+    SRP6M,
+    MAX
+};
 
-extern "C" __declspec(dllexport) void Load2()
+class Offsets
 {
-    method::gMethod = std::make_unique<method::Two>();
-}
+    private:
+        static constexpr std::uint32_t DefaultBase = 0x400000;
+        const std::uint32_t _base;
+
+        std::uint32_t _offsets[Offset::MAX];
+        bool _cata;
+
+    public:
+        Offsets();
+
+        std::uint32_t Get(Offset offset) const;
+        std::uint32_t GetStatic(Offset offset) const;
+
+        bool IsCata() const { return _cata; }
+};
+
+const Offsets &sOffsets();
